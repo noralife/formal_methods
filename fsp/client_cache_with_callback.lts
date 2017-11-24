@@ -1,0 +1,37 @@
+const CountMin = 1
+const CountMax = 2
+range CounterStateT = CountMin..CountMax
+
+const CacheNone = 0
+const CacheMax = CountMax
+range CacheStateT = CacheNone..CacheMax
+
+CLIENT = RUNNING[CacheNone],
+    RUNNING[c:CacheStateT] =
+    (
+        when(c!=CacheNone) use_cache[c] -> RUNNING[c]
+        |
+        request -> responce[count:CounterStateT] -> cached -> RUNNING[count]
+        |
+        when(c!=CacheNone) callback[count:CounterStateT] -> RUNNING[count]
+    ).
+
+SERVER = RUNNING[CountMin],
+    RUNNING[c:CounterStateT] =
+    (
+        update_count[count:CounterStateT] -> RUNNING[count]
+        |
+        request -> responce[c] -> RUNNING[c]
+    ).
+
+||CLIENT_SERVER = (CLIENT || SERVER)/{update_count[c:CounterStateT]/callback[c]}.
+
+fluent SERVER_COUNTER[c:CounterStateT] = <{update_count[c], responce[c]},
+                                          {update_count[(c%2)+1],
+                                           responce[(c%2)+1]}>
+fluent CLIENT_CACHE[c:CounterStateT] = <{update_count[c], responce[c]},
+                                        {update_count[(c%2)+1],
+                                         responce[(c%2)+1]}>
+
+assert CONSISTENCY = [] forall [c:CounterStateT]
+                                      (CLIENT_CACHE[c] -> SERVER_COUNTER[c])
