@@ -1,4 +1,4 @@
---------------------------- MODULE SimpleProgram ---------------------------
+---------------------------- MODULE ClientServer ----------------------------
 VARIABLES
   serverState,
   clientState,
@@ -39,9 +39,9 @@ Client == Request
 -----------------------------------------------------------------------------
 Next == Server \/ Client
 -----------------------------------------------------------------------------
-EventualConsistency == <>(clientCache /= nocache => serverData = clientCache)
 StrongConsistency == [](clientCache /= nocache => serverData = clientCache)
+
 =============================================================================
 \* Modification History
-\* Last modified Fri Nov 24 00:55:03 EST 2017 by tnanjo
-\* Created Thu Nov 23 21:29:30 EST 2017 by tnanjo
+\* Last modified Fri Nov 24 07:57:38 EST 2017 by tnanjo
+\* Created Fri Nov 24 07:55:29 EST 2017 by tnanjo
